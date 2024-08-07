@@ -15,7 +15,7 @@ const client = new Client({
 
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath);
+const commandFolders = fs.readdirSync(foldersPath).filter(folder => folder != ".DS_Store");
 
 for (const folder of commandFolders) {
 	const commandsPath = path.join(foldersPath, folder);
