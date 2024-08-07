@@ -3,7 +3,15 @@ const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { token } = require('./config.json');
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+	intents: [GatewayIntentBits.Guilds,
+	GatewayIntentBits.DirectMessages,
+	GatewayIntentBits.MessageContent,
+	GatewayIntentBits.GuildMessages,
+	GatewayIntentBits.GuildMembers],
+	partials: [Discord.Partials.Channel]
+});
+
 
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'commands');
@@ -35,6 +43,20 @@ for (const file of eventFiles) {
 		client.on(event.name, (...args) => event.execute(...args));
 	}
 }
+//from copilot
+client.on('messageCreate', async (message) => {
+	console.log("I hear you")
+	// // Ignore messages from the bot itself
+	// if (message.author.bot) return;
 
+	// // Log the message content to the console
+	// console.log(`Message received: ${message.content}`);
+
+	// // Respond to specific messages
+	// if (message.content === 'parrot') {
+	// 	message.reply(`${message.content}`);
+	// }
+});
+//isncerely
 client.login(token);
 
