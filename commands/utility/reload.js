@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
-    data: new SlashCommandBuilder
+    data: new SlashCommandBuilder()
         .setName('reload')
         .setDescription('Reloads a command')
         .addStringOption(option =>
