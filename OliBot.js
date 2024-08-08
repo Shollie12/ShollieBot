@@ -54,10 +54,11 @@ client.on('messageCreate', async (message) => {
 	console.log(`Message received: ${message.content}`);
 
 	// Respond to specific messages
-	if (message.content.includes("parrot")) {
-		message.reply(`${message.content}`);
+	if (message.content.includes("<@1268359806083792958>")) {
+
+		message.channel.send(`${message.content.replace("<@1268359806083792958>", " ")}`);
 	}
 });
-//isncerely
+//insincerely
 client.login(token);
 
