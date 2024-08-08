@@ -1,3 +1,7 @@
+/*
+The 'parrot' command repeats whatever message is inputted into the 'message' option
+back to the user.
+*/
 const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
@@ -9,16 +13,16 @@ module.exports = {
                 .setName('message')
                 .setDescription('The message to be repeated.')
                 .setRequired(true)),
-    async execute(interaction){
+    async execute(interaction) {
         const message = interaction.options.getString('message', true);
 
-        try{
-            await interaction.reply('*sqwuak!*  ' + message + '  *squawk!*');
+        try {
+            await interaction.reply(`*sqwuak!*  ${message}  *squawk!*`);
         }
-        catch(error){
+        catch (error) {
             console.error(error);
-            await interaction.reply('*sqwuak!* There was an error repeating your message! *squawk!*\n\`' + error.message +'\`');
+            await interaction.reply(`*sqwuak!*  There was an error repeating your message!  *squawk!*\n\`${error.message}\``);
         }
-        
+
     }
 }
