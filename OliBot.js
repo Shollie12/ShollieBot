@@ -2,8 +2,6 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits, Partials } = require('discord.js');
 const { token } = require('./config.json');
-const axios = require("axios"); //axios implementation
-//Axios is an HTTP interaciton API
 
 const client = new Client({
 	intents: [GatewayIntentBits.Guilds,
@@ -13,7 +11,6 @@ const client = new Client({
 	GatewayIntentBits.GuildMembers],
 	partials: [Partials.Channel]
 });
-
 
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'commands');
@@ -45,21 +42,9 @@ for (const file of eventFiles) {
 		client.on(event.name, (...args) => event.execute(...args));
 	}
 }
-axios.get('http://www.randomnumberapi.com/api/v1.0/random?min=100&max=1000&count=5')
-.then(function (response) {
-    // handle success
-	console.log(response.data[0]);
-  })
-  .catch(function (error) {
-    // handle error
-    console.log(error);
-  })
-  .finally(function () {
-    // always executed
 
-  });
-
-//from Oliver
+/*
+Edited out. All comment contents have been moved to events --> messageCreate.js. 
 client.on('messageCreate', async (message) => {
 	console.log("I hear you")
 	// Ignore messages from the bot itself
@@ -74,8 +59,8 @@ client.on('messageCreate', async (message) => {
 		message.reply(`yeah, yeah, yeah, I hear you... ${message.content} or whatever...`);
 	}
 });
-//sincerely
-//
+*/
+
 let my_json = {
 	name: "oliver",
 	class: "wizard",
