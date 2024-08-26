@@ -13,15 +13,13 @@ module.exports = {
         axios.get('http://www.randomnumberapi.com/api/v1.0/random?min=1&max=100&count=1')
   .then(await function (response) {
     // handle success
+    console.log(`\n\nThis is the response: ${response.data[0]}\n\n`);
     interaction.reply(`${response.data[0]}`);
   })
   .catch(function (error) {
     // handle error
     console.log(error);
   })
-  .finally(function () {
-    // always executed
-  });
 	},
 };
 
