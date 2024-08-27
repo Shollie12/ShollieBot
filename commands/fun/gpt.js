@@ -7,19 +7,30 @@ const axios = require("axios");
 
 // Edit options for the generated response.
 let my_json = {
-  max_context_length: 2048,
-  max_length: 100,
-  prompt: "",
-  quiet: false,
-  rep_pen: 1.1,
-  rep_pen_range: 256,
-  rep_pen_slope: 1,
-  temperature: 0.5,
-  tfs: 1,
-  top_a: 0,
+ n: 1, 
+ max_context_length: 2096,
+  max_length: 200,
+  rep_pen: 1.07,
+  temperature: 0.7,
+  top_p: 0.92,
   top_k: 100,
-  top_p: 0.9,
-  typical: 1
+  top_a: 0,
+  typical: 1,
+  tfs: 1,
+ rep_pen_range: 320,
+  rep_pen_slope: 0.7,
+  sampler_order: [6, 0, 1, 3, 4, 2, 5],
+  memory: "", 
+  trim_stop: true,
+  genkey: "KCPP8197",
+  min_p: 0,
+ dynatemp_range: 0, 
+ dynatemp_exponent: 1, 
+ smoothing_factor: 0, 
+ banned_tokens: [], 
+ render_special: false, 
+ presence_penalty: 0, 
+ logit_bias: {}
 }
 
 module.exports = {
