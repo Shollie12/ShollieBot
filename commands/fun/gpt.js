@@ -61,9 +61,7 @@ module.exports = {
     await axios.post(`http://localhost:5001/api/v1/generate`, JSON.stringify(my_json))
       .then(async function (response) {
         // handle success
-        const responseObj = JSON.parse(response)
-        const rawText = responseObj.results[0].text;
-        // const rawText = response.data.results[0].text;
+        const rawText = response.data.results[0].text;
         console.log(`\nThis is the raw text: ${rawText.replace(/\n/g, `\\n`).replace(/\r/g, `\\r`)}`);
         const cleanText = rawText.replace(/^\n/g, ``);
         await interaction.editReply(`> *${userprompt}*\n${cleanText}`);
