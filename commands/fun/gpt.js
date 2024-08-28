@@ -64,14 +64,25 @@ module.exports = {
     //     console.log(error);
     //   })
 
-    await interaction.deferReply();
+    let thinkMessage;
+    if(!prompt){
+      await interaction.deferReply();
+    } else {
+      thinkMessage = await interaction.channel.send(`:thinking: Thinking...`);
+    }
+    
     await axios.post(`http://localhost:5001/api/v1/generate`, JSON.stringify(my_json))
       .then(async function (response) {
         // handle success
         const rawText = response.data.results[0].text;
         console.log(`\nThis is the raw text: ${rawText.replace(/\n/g, `\\n`).replace(/\r/g, `\\r`)}`);
         const cleanText = rawText.replace(/^\n/g, ``);
-        await interaction.editReply(`> *${userprompt}*\n\n${cleanText}`);
+        if(!prompt){
+          await interaction.editReply(`> *${userprompt}*\n\n${cleanText}`);
+        } else {
+          thinkMessage.delete();
+          await interaction.reply(`> *${userprompt}*\n\n${cleanText}`)
+        }
       })
       .catch(function (error) {
         // handle error
