@@ -13,8 +13,15 @@ module.exports = {
                 .setName('message')
                 .setDescription('The message to be repeated.')
                 .setRequired(true)),
-    async execute(interaction) {
-        const message = interaction.options.getString('message', true);
+    async execute(interaction, msg) {
+        let message;
+        if(!msg){
+            message = interaction.options.getString('message', true);
+        }
+        else{
+            message = msg;
+        }
+        
 
         try {
             await interaction.reply(`*sqwuak!*  ${message}  *squawk!*`);

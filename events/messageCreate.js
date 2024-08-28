@@ -17,22 +17,26 @@ module.exports = {
 			message.reply(`yeah, yeah, yeah, I hear you... ${message.content} or whatever...`);
 		}
 
-		// Respond to commands if using the prefix, takes command up to the next space character
+		// Respond to commands if using the prefix, breaks the message into components.
+		// Ex: &parrot Hello World!
+		// Variable Names  -->   | cmdstr | option
+		// Variable Values --> & | parrot | Hello World!
 		if (!message.toString().startsWith(prefix)) return;
 
 		let endCommandIndex = message.content.indexOf(' ');
 		if(endCommandIndex == -1) endCommandIndex = message.length;
 
 		const cmdstr = message.toString().substring(1, endCommandIndex);
+		const option = message.toString().substring(endCommandIndex + 1);
 		const command = message.client.commands.get(cmdstr);
 
 		if (!command) {
 			console.error(`No command matching ${cmdstr} was found.`);
 			return;
 		}
-
+		console.log(`This is what you sent in: ${option}`);
 		try {
-			await command.execute(message);
+			await command.execute(message, option);
 		} catch (error) {
 			console.error(error);
 			message.reply({ content: 'There was an error while executing this command!', ephemeral: true });

@@ -42,8 +42,15 @@ module.exports = {
         .setName('prompt')
         .setDescription('The prompt to be sent to the bot.')
         .setRequired(true)),
-  async execute(interaction) {
-    const userprompt = interaction.options.getString('prompt', true);
+  async execute(interaction, prompt) {
+    // Chat command support
+    let userprompt;
+    if(!prompt){
+      userprompt = interaction.options.getString('prompt', true);
+    } else {
+      userprompt = prompt;
+    }
+
     my_json.prompt = userprompt;
     console.log(JSON.stringify(my_json));
 
@@ -64,7 +71,7 @@ module.exports = {
         const rawText = response.data.results[0].text;
         console.log(`\nThis is the raw text: ${rawText.replace(/\n/g, `\\n`).replace(/\r/g, `\\r`)}`);
         const cleanText = rawText.replace(/^\n/g, ``);
-        await interaction.editReply(`> *${userprompt}*\n${cleanText}`);
+        await interaction.editReply(`> *${userprompt}*\n\n${cleanText}`);
       })
       .catch(function (error) {
         // handle error
