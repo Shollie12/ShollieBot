@@ -3,36 +3,18 @@ The 'gpt' command sends an HTTP request to http://localhost:5001/api/v1/generate
 once koboldcpp is running and responds with an AI generated response.
 */
 const { SlashCommandBuilder } = require('discord.js');
-const axios = require("axios");
+const { clientId } = require('../../config.json');
+const path = require('path');
+const axios = require('axios');
+
+//Connect to database
+const pathToFolder = path.join(__dirname, '../../db');
+const db = require('diskdb');
+db.connect(pathToFolder, ['messages']);
 
 // Edit options for the generated response.
-let my_json = {
- n: 1, 
- max_context_length: 2096,
-  max_length: 200,
-  rep_pen: 1.07,
-  temperature: 0.7,
-  top_p: 0.92,
-  top_k: 100,
-  top_a: 0,
-  typical: 1,
-  tfs: 1,
- rep_pen_range: 320,
-  rep_pen_slope: 0.7,
-  sampler_order: [6, 0, 1, 3, 4, 2, 5],
-  memory: "", 
-  trim_stop: true,
-  genkey: "KCPP8197",
-  min_p: 0,
- dynatemp_range: 0, 
- dynatemp_exponent: 1, 
- smoothing_factor: 0, 
- banned_tokens: [], 
- render_special: false, 
- presence_penalty: 0, 
- logit_bias: {}
-}
-
+const cppconfig = require('./cppconfig.json')
+  
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('gpt')
@@ -51,18 +33,15 @@ module.exports = {
       userprompt = prompt;
     }
 
-    my_json.prompt = userprompt;
-    console.log(JSON.stringify(my_json));
-
-    //// Testing the GET endpoint of koboldcpp
-    // await axios.get(`http://localhost:5001/api/v1/model`)
-    //   .then(function(answer) {
-    //     interaction.reply(`This chatbot's current model is: ${answer.data.result}`);
-    //   })
-    //   .catch(function(error){
-    //     interaction.reply(`Sorry, couldn't get that for ya.`)
-    //     console.log(error);
-    //   })
+    //Add user's message to the database
+    const usermessage = {
+      text: userprompt,
+      isUser: true,
+      userID: interaction.member.id,
+      timestamp: interaction.createdTimestamp,
+      sessionID: interaction.channel.id,
+    };
+    db.messages.save(usermessage);
 
     let thinkMessage;
     if(!prompt){
@@ -71,18 +50,31 @@ module.exports = {
       thinkMessage = await interaction.channel.send(`:thinking: Thinking...`);
     }
     
-    await axios.post(`http://localhost:5001/api/v1/generate`, JSON.stringify(my_json))
+    cppconfig.prompt = userprompt;
+    await axios.post(`http://localhost:5001/api/v1/generate`, cppconfig)
       .then(async function (response) {
-        // handle success
+        // Clean text and print raw text.
         const rawText = response.data.results[0].text;
         console.log(`\nThis is the raw text: ${rawText.replace(/\n/g, `\\n`).replace(/\r/g, `\\r`)}`);
         const cleanText = rawText.replace(/^\n/g, ``);
+
+        let aiReply;
         if(!prompt){
-          await interaction.editReply(`> *${userprompt}*\n\n${cleanText}`);
+          aiReply = await interaction.editReply(`> *${userprompt}*\n\r${cleanText}`);
         } else {
-          thinkMessage.delete();
-          await interaction.reply(`> *${userprompt}*\n\n${cleanText}`)
+          await thinkMessage.delete();
+          aiReply = await interaction.reply(`\n\r${cleanText}`);
         }
+
+        // Save the bot's message to the database.
+        const botmessage = {
+          text: cleanText,
+          isUser: false,
+          userID: clientId,
+          timestamp: aiReply.createdTimestamp,
+          sessionID: aiReply.channel.id,
+        };
+        db.messages.save(botmessage);
       })
       .catch(function (error) {
         // handle error
