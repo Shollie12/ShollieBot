@@ -4,9 +4,10 @@ const { prefix } = require('../config.json');
 module.exports = {
 	name: Events.MessageCreate,
 	async execute(message) {
-		console.log("I hear you")
 		// Ignore messages from the bot itself
 		if (message.author.bot) return;
+
+		console.log("I hear you")
 
 		// Log the message content to the console
 		console.log(`Message received: ${message.content}`);
@@ -21,7 +22,7 @@ module.exports = {
 		// Ex: &parrot Hello World!
 		// Variable Names  -->   | cmdstr | option
 		// Variable Values --> & | parrot | Hello World!
-		if (!message.toString().startsWith(prefix)) return;
+		if (!message.content.startsWith(prefix)) return;
 
 		let endCommandIndex = message.content.indexOf(' ');
 		if(endCommandIndex == -1) endCommandIndex = message.length;
@@ -34,7 +35,6 @@ module.exports = {
 			console.error(`No command matching ${cmdstr} was found.`);
 			return;
 		}
-		console.log(`This is what you sent in: ${option}`);
 		try {
 			await command.execute(message, option);
 		} catch (error) {

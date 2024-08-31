@@ -7,13 +7,14 @@ const { clientId } = require('../../config.json');
 const path = require('path');
 const axios = require('axios');
 
-//Connect to database
+// Connect to the database.
 const pathToFolder = path.join(__dirname, '../../db');
 const db = require('diskdb');
 db.connect(pathToFolder, ['messages']);
 
 // Edit options for the generated response.
-const cppconfig = require('./cppconfig.json')
+const cppconfig = require('./cppconfig.json');
+const { channel } = require('diagnostics_channel');
   
 module.exports = {
   data: new SlashCommandBuilder()
@@ -26,22 +27,12 @@ module.exports = {
         .setRequired(true)),
   async execute(interaction, prompt) {
     // Chat command support
-    let userprompt;
+    let userPrompt;
     if(!prompt){
-      userprompt = interaction.options.getString('prompt', true);
+      userPrompt = interaction.options.getString('prompt', true);
     } else {
-      userprompt = prompt;
+      userPrompt = prompt;
     }
-
-    //Add user's message to the database
-    const usermessage = {
-      text: userprompt,
-      isUser: true,
-      userID: interaction.member.id,
-      timestamp: interaction.createdTimestamp,
-      sessionID: interaction.channel.id,
-    };
-    db.messages.save(usermessage);
 
     let thinkMessage;
     if(!prompt){
@@ -50,7 +41,37 @@ module.exports = {
       thinkMessage = await interaction.channel.send(`:thinking: Thinking...`);
     }
     
-    cppconfig.prompt = userprompt;
+    // Add context to the User's prompt
+    const stop_sequence = ["### Instruction:", "### Response:"]
+    const channelID = interaction.channel.id;
+    const rawContext = db.messages.find({sessionID: channelID});
+    rawContext.sort(function(a, b){
+      return a.timestamp - b.timestamp;
+    });
+    let contextPrompt = ``;
+    rawContext.forEach(msg => {
+      //contextPrompt += `\n${msg.username}: ` + msg.text;
+      if(msg.isUser){
+        contextPrompt += stop_sequence[0] + msg.text;
+      } else {
+        contextPrompt += stop_sequence[1] + msg.text;
+      }
+    });
+    //contextPrompt += `\n${interaction.member.nickname}: ` + userPrompt;
+    contextPrompt += stop_sequence[0] + userPrompt;
+    cppconfig.prompt = contextPrompt;
+
+    //Add user's message to the database
+    const usermessage = {
+      text: userPrompt,
+      isUser: true,
+      userID: interaction.member.id,
+      username: interaction.member.nickname,
+      timestamp: interaction.createdTimestamp,
+      sessionID: channelID,
+    };
+    db.messages.save(usermessage);
+
     await axios.post(`http://localhost:5001/api/v1/generate`, cppconfig)
       .then(async function (response) {
         // Clean text and print raw text.
@@ -60,7 +81,7 @@ module.exports = {
 
         let aiReply;
         if(!prompt){
-          aiReply = await interaction.editReply(`> *${userprompt}*\n\r${cleanText}`);
+          aiReply = await interaction.editReply(`> *${userPrompt}*\n\r${cleanText}`);
         } else {
           await thinkMessage.delete();
           aiReply = await interaction.reply(`\n\r${cleanText}`);
@@ -71,8 +92,9 @@ module.exports = {
           text: cleanText,
           isUser: false,
           userID: clientId,
+          username: `Sholliebot`,
           timestamp: aiReply.createdTimestamp,
-          sessionID: aiReply.channel.id,
+          sessionID: channelID,
         };
         db.messages.save(botmessage);
       })

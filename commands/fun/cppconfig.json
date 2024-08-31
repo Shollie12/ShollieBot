@@ -11,5 +11,6 @@
     "top_a": 0,
     "top_k": 100,
     "top_p": 0.92,
-    "typical": 1
+    "typical": 1,
+    "stop_sequence": ["### Instruction:", "### Response:"]
 }

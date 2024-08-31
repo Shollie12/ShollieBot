@@ -16,15 +16,21 @@ module.exports = {
             option.setName('command')
                 .setDescription('The command to reload.')
                 .setRequired(true)),
-    async execute(interaction) {
-        const commandName = interaction.options.getString('command', true).toLowerCase();
+    async execute(interaction, reloadOption) {
+        // Chat Command Support
+        let commandName;
+        if(!reloadOption) {
+            commandName = interaction.options.getString('command', true).toLowerCase();
+        } else {
+            commandName = reloadOption.toLowerCase();
+        }
         const command = interaction.client.commands.get(commandName);
-
+        
         if (!command) {
             return interaction.reply(`There is no command with the name \`${commandName}\``);
         }
 
-        //Scans all files in all folders in the 'commands' folder (or whatever file is 2 directories above)
+        // Scans all files in all folders in the 'commands' folder (or whatever file is 2 directories above)
         let filePathtoReload = null;
         const foldersPath = path.join(__dirname, '..');
         const folders = fs.readdirSync(path.join(__dirname, '..')).filter(folder => folder != ".DS_Store");;
