@@ -52,13 +52,14 @@ module.exports = {
     rawContext.forEach(msg => {
       //contextPrompt += `\n${msg.username}: ` + msg.text;
       if(msg.isUser){
-        contextPrompt += stop_sequence[0] + msg.text;
+        contextPrompt += stop_sequence[0] + msg.text + stop_sequence[1];
       } else {
-        contextPrompt += stop_sequence[1] + msg.text;
+        //contextPrompt += stop_sequence[1] + msg.text;
+        contextPrompt += msg.text;
       }
     });
     //contextPrompt += `\n${interaction.member.nickname}: ` + userPrompt;
-    contextPrompt += stop_sequence[0] + userPrompt;
+    contextPrompt += stop_sequence[0] + userPrompt + stop_sequence[1];
     cppconfig.prompt = contextPrompt;
 
     //Add user's message to the database
