@@ -78,7 +78,7 @@ module.exports = {
         // Clean text and print raw text.
         const rawText = response.data.results[0].text;
         console.log(`\nThis is the raw text: ${rawText.replace(/\n/g, `\\n`).replace(/\r/g, `\\r`)}`);
-        const cleanText = rawText.replace(/^\n/g, ``);
+        const cleanText = rawText.replace(/^\n|(### Instruction:)/g, ``);
 
         let aiReply;
         if(!prompt){
